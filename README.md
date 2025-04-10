@@ -1,0 +1,177 @@
+# CBT994
+Converted to GitHub via [cbt2git](https://github.com/wizardofzos/cbt2git)
+
+This is still a work in progress. GitHub repos will be deleted and created during this period...
+
+```
+//***FILE 994 is from Sam Golob (indirectly by way of Jeff Broido   *   FILE 994
+//*           and directly by way of Bill Godfrey), and contains    *   FILE 994
+//*           two programs to dump the contents of a load module    *   FILE 994
+//*           in hex, so that you can see its contents, and all     *   FILE 994
+//*           the displacements accurately, in the load module.     *   FILE 994
+//*                                                                 *   FILE 994
+//*           The load madule library can be either a PDS or a      *   FILE 994
+//*           PDSE.                                                 *   FILE 994
+//*                                                                 *   FILE 994
+//*           THIS IS A NEW WAY OF LOOKING AT LOAD MODULES, THE     *   FILE 994
+//*           LIKES OF WHICH YOU HAVE NEVER SEEN BEFORE.            *   FILE 994
+//*                                                                 *   FILE 994
+//*           This will help you "see" all the EXECUTABLE data      *   FILE 994
+//*           within a load module, with the displacements          *   FILE 994
+//*           displayed prominently and clearly.                    *   FILE 994
+//*                                                                 *   FILE 994
+//*           The dump is in an ISPF-like hex format, with ruler.   *   FILE 994
+//*                             --------- --- ------  ---- -----    *   FILE 994
+//*           email:   sbgolob@cbttape.org                          *   FILE 994
+//*                                                                 *   FILE 994
+//*    You can direct the LOAD of the load module to a particular   *   FILE 994
+//*    pds, by allocating a TASKLIB DD as follows:                  *   FILE 994
+//*                                                                 *   FILE 994
+//*        ALLOC FI(TASKLIB) DA(your.load.library) SH REUSE         *   FILE 994
+//*                                                                 *   FILE 994
+//*    If the load module is in LPA, and you don't allocate a       *   FILE 994
+//*    TASKLIB DD name, then the LOAD will go to LPA.  Otherwise    *   FILE 994
+//*    the system will pick where to do the LOAD from.              *   FILE 994
+//*                                                                 *   FILE 994
+//*    Here is some sample output of LISTMOD.  Actual displacements *   FILE 994
+//*    are shown after each hex line, so you can SEE all the actual *   FILE 994
+//*    displacements inside the load module.                        *   FILE 994
+//*                                                                 *   FILE 994
+//*    Command:  TSOV LISTMOD IKJEFT02                              *   FILE 994
+//*                                                                 *   FILE 994
+//*    Example for sample below:    (to the right of each hex line) *   FILE 994
+//*                                   shows displacements           *   FILE 994
+//*                                                        00000000 *   FILE 994
+//*                                                        00000040 *   FILE 994
+//*                                                        00000080 *   FILE 994
+//*                                                        000000C0 *   FILE 994
+//*                                so you can find any displacement *   FILE 994
+//*                                inside the load module.          *   FILE 994
+//*                                See the HELP member for LISTMOD. *   FILE 994
+//* Loaded Program Name:  IKJEFT02                                  *   FILE 994
+//* ----------------------------------------------------------------*   FILE 994
+//* Module has been LOADED. CDE Address: 008A4DC8                   *   FILE 994
+//* Length of loaded module Hex:  0000AB38    Decimal:       43832  *   FILE 994
+//* Length after entry address :  0000AB38    Decimal:       43832  *   FILE 994
+//* Displacement of entry point:  00000000    Decimal:           0  *   FILE 994
+//* ----------------------------------------------------------------*   FILE 994
+//*                                                                 *   FILE 994
+//*  00    IKJEFT02:TMP MAINLINE CONTROL PROGRAM 23082 092048  00   *   FILE 994
+//* 4FF4083CDDCCEFF7EDD4DCCDDCDC4CDDEDDD4DDDCDCD4FFFFF4FFFFFF44FF006*   FILE 994
+//* 70000A392156302A347041953955036539630796791402308200920480700608*   FILE 994
+//* 0---+---+---+---1---+---+---+---2---+---+---+---3---+---+---+---*   FILE 994
+//*                                                                 *   FILE 994
+//* First instruction: x'47F0F040' skips over the header.           *   FILE 994
+//* Header is 64 bytes long.  Note the X'90ECD00C' at +64. (X'40')  *   FILE 994
+//*                                                                 *   FILE 994
+//*   }  -  ?   "        0           0-     i0    -      A&}{ &{} q1*   FILE 994
+//* 9ED006476F4A7F4BAF1F4FB510B0B5004F6200108F00BF6111071C5DC05CD09F*   FILE 994
+//* 0C0C5010FF10FF10FFFF3065F0F76670700200209008FD0EB1A8810004000881*   FILE 994
+//* 0---+---+---+---1---+---+---+---2---+---+---+---3---+---+---+---*   FILE 994
+//*                                                                 *   FILE 994
+//* }   ¢00    &          {        0-- \>  \   \\% \\             -o*   FILE 994
+//* D11D4FF00F55B543001544C01413044F664E6C5E025EE65EE152E05321134869*   FILE 994
+//* 008CA0047F8065100CB31000A3B3E2700050EC8024800C8004801C8000237006*   FILE 994
+//* 0---+---+---+---1---+---+---+---2---+---+---+---3---+---+---+---*   FILE 994
+//*                                                                 *   FILE 994
+//* j    \-o \S   \     o    0-  a    m"   \   \\% \\ &\           \*   FILE 994
+//* 98374E695EE658E3B001988A4F6A18B001978A5E025EE65EE15E855282B0204E*   FILE 994
+//* 10007006802880002A00600A7000812A004F0A8024800C8004000880002A0050*   FILE 994
+//* 0---+---+---+---1---+---+---+---2---+---+---+---3---+---+---+---*   FILE 994
+//*                                                         etc.    *   FILE 994
+//*                                                                 *   FILE 994
+//*           Important Note:                                       *   FILE 994
+//*           --------- ----                                        *   FILE 994
+//*           If you invoke LISTMOD or LISTMODD without parameters, *   FILE 994
+//*           then you will dump the ENTIRE MODULE from the         *   FILE 994
+//*           beginning to the end.  The header information         *   FILE 994
+//*           (see below) will help you locate the entry point      *   FILE 994
+//*           of the module displayed, within the dump of the       *   FILE 994
+//*           entire load module.                                   *   FILE 994
+//*                                                                 *   FILE 994
+//*           If you invoke LISTMOD or LISTMODD with the parameter  *   FILE 994
+//*           "ENTRY", then the display will only go from the       *   FILE 994
+//*           entry point until the physical end of the module.     *   FILE 994
+//*                                                                 *   FILE 994
+//*           Two programs which are included:                      *   FILE 994
+//*                                                                 *   FILE 994
+//*           LISTMOD, which dumps  64 characters of the load       *   FILE 994
+//*           module per line, and counts the displacements in      *   FILE 994
+//*           hexadecimal numbers.                                  *   FILE 994
+//*                                                                 *   FILE 994
+//*           LISTMODD, which dumps 100 characters of the load      *   FILE 994
+//*           module per line, and counts the displacements in      *   FILE 994
+//*           decimal numbers.  (LISTMOD with DECIMAL display)      *   FILE 994
+//*                                                                 *   FILE 994
+//*           Enough information is included in the headers         *   FILE 994
+//*           of the program outputs, to help you find the          *   FILE 994
+//*           information you want, in the load module.             *   FILE 994
+//*           as follows:                                           *   FILE 994
+//*                                                                 *   FILE 994
+//*    Sample heading information from a LOADED module:             *   FILE 994
+//*    (same heading for either program)                            *   FILE 994
+//*                                                                 *   FILE 994
+//* Loaded Program Name:  IEBCOPY                                   *   FILE 994
+//* --------------------------------------------------------------  *   FILE 994
+//* Module has been LOADED.       CDE Address:  009A9090            *   FILE 994
+//* Length of loaded module Hex:  00025CB0    Decimal:      154800  *   FILE 994
+//* Length after entry address :  00020CB0    Decimal:      134320  *   FILE 994
+//* Displacement of entry point:  00005000    Decimal:       20480  *   FILE 994
+//*                                                                 *   FILE 994
+//*    Sample heading information from a LPA module:                *   FILE 994
+//*                                                                 *   FILE 994
+//* Loaded Program Name:  IEFAB4A0                                  *   FILE 994
+//* ----------------------------------------------------------------*   FILE 994
+//* Module is from LPA.  LPDE Address: 00C742D0   Alias of: IEFW21SD*   FILE 994
+//* Length of loaded module Hex:  000DD450    Decimal:      906320  *   FILE 994
+//* Length after entry address :  00070D08    Decimal:      462088  *   FILE 994
+//* Displacement of entry point:  0006C748    Decimal:      444232  *   FILE 994
+//*                                                                 *   FILE 994
+//*           Output is in PUTLINE format, so it can be captured    *   FILE 994
+//*           and displayed on a full screen.                       *   FILE 994
+//*                                                                 *   FILE 994
+//*           Since the outputs are often very large, and need to   *   FILE 994
+//*           be captured in their entirety so the whole display    *   FILE 994
+//*           is visible and scrollable, therefore we have included *   FILE 994
+//*           Mark Zelden's TSOE, TSOV, TSOB, and TSOR REXX execs   *   FILE 994
+//*           here, to make the display easier, doing the outtrap   *   FILE 994
+//*           automatically.                                        *   FILE 994
+//*                                                                 *   FILE 994
+//*           For example: TSO TSOV LISTMOD  pgmname  (hex measure) *   FILE 994
+//*                                                                 *   FILE 994
+//*                        TSO TSOV LISTMODD pgmname  (dec measure) *   FILE 994
+//*                                                                 *   FILE 994
+//*           Or:                                                   *   FILE 994
+//*                                                                 *   FILE 994
+//*               TSO TSOV LISTMOD  pgmname ENTRY  (hex measure)    *   FILE 994
+//*                                                                 *   FILE 994
+//*               TSO TSOV LISTMODD pgmname ENTRY  (dec measure)    *   FILE 994
+//*                                                                 *   FILE 994
+//*               TSO TSOV LISTHEAD pgmname ENTRY                   *   FILE 994
+//*                                                                 *   FILE 994
+//*       Description of the programs:                              *   FILE 994
+//*                                                                 *   FILE 994
+//*           LISTMOD  - Displays the load module in 64-byte lines. *   FILE 994
+//*                      Displacements from the beginning are       *   FILE 994
+//*                      marked in hex.  75-byte wide display.      *   FILE 994
+//*                                                                 *   FILE 994
+//*           LISTMODD - Displays the load module in 100-byte lines *   FILE 994
+//*                      with the display being 112-bytes wide.     *   FILE 994
+//*                      Displacements from the beginning are       *   FILE 994
+//*                      marked in decimal.  Multiples of 100.      *   FILE 994
+//*                                                                 *   FILE 994
+//*           LISTHEAD - Program originally from Jeff Broido,       *   FILE 994
+//*                      which displays standard load module        *   FILE 994
+//*                      headers if they exist, and also the        *   FILE 994
+//*                      first 400 bytes of the load module,        *   FILE 994
+//*                      either at its beginning, or at its         *   FILE 994
+//*                      entry point.  This program had to be       *   FILE 994
+//*                      modified extensively, because IBM software *   FILE 994
+//*                      programmers have now modified their        *   FILE 994
+//*                      program entry code to vary, very much.     *   FILE 994
+//*                      Also, the new PL/X compilers now use the   *   FILE 994
+//*                      new JUMP instructions instead of the old   *   FILE 994
+//*                      47F0 (branch) instruction, to bypass the   *   FILE 994
+//*                      program headers.                           *   FILE 994
+//*                                                                 *   FILE 994
+```
